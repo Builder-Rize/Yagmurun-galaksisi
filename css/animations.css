@@ -1,0 +1,405 @@
+/* ========================================
+   Yağmur'NIN 12 KAPISI - ANİMASYONLAR
+   Patlamalar, glow'lar, altın ışıltılar
+   Kraliçem için özel! 🤍
+   ======================================== */
+
+/* ========================================
+   ⭐ TEMEL ANİMASYONLAR
+   ======================================== */
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(147, 51, 234, 0.6),
+            0 0 50px rgba(147, 51, 234, 0.4);
+    }
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.3);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.3);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+@keyframes starPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px rgba(147, 51, 234, 0.5));
+    }
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 25px rgba(147, 51, 234, 0.8));
+    }
+}
+
+@keyframes goldGlow {
+    0% {
+        box-shadow: 
+            0 0 20px rgba(251, 191, 36, 0.5),
+            inset 0 0 20px rgba(251, 191, 36, 0.1);
+    }
+    100% {
+        box-shadow: 
+            0 0 40px rgba(251, 191, 36, 0.9),
+            0 0 80px rgba(251, 191, 36, 0.5),
+            inset 0 0 30px rgba(251, 191, 36, 0.3);
+    }
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -100;
+    }
+}
+
+@keyframes modalSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    70% {
+        transform: translateY(10px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes matchPulse {
+    0% {
+        transform: scale(1) rotateY(180deg);
+    }
+    50% {
+        transform: scale(1.2) rotateY(180deg);
+    }
+    100% {
+        transform: scale(1) rotateY(180deg);
+    }
+}
+
+/* ========================================
+   💥 ALTIN PARLTI EFEKTİ (Aşk Yıldızı)
+   ======================================== */
+
+.gold-flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, rgba(251, 191, 36, 0.5) 50%, transparent 70%);
+    z-index: 5000;
+    pointer-events: none;
+    opacity: 0;
+    animation: goldFlash 1.5s ease-out forwards;
+}
+
+@keyframes goldFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    60% {
+        opacity: 0.8;
+        transform: scale(2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(3);
+    }
+}
+
+/* ========================================
+   🤍 KALP YAĞMURU
+   ======================================== */
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.hearts-rain.active .falling-heart:nth-child(odd) {
+    animation-duration: 3s;
+}
+
+.hearts-rain.active .falling-heart:nth-child(even) {
+    animation-duration: 4s;
+}
+
+/* ========================================
+   ✨ YILDIZ BELİRME ANİMASYONU
+   ======================================== */
+
+@keyframes starAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(10deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.star-node {
+    animation: starAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Staggered delays */
+.star-node:nth-child(1) { animation-delay: 0.1s; }
+.star-node:nth-child(2) { animation-delay: 0.2s; }
+.star-node:nth-child(3) { animation-delay: 0.3s; }
+.star-node:nth-child(4) { animation-delay: 0.4s; }
+.star-node:nth-child(5) { animation-delay: 0.5s; }
+.star-node:nth-child(6) { animation-delay: 0.6s; }
+.star-node:nth-child(7) { animation-delay: 0.7s; }
+.star-node:nth-child(8) { animation-delay: 0.8s; }
+.star-node:nth-child(9) { animation-delay: 0.9s; }
+.star-node:nth-child(10) { animation-delay: 1.0s; }
+.star-node:nth-child(11) { animation-delay: 1.1s; }
+.star-node:nth-child(12) { animation-delay: 1.2s; }
+
+/* ========================================
+   🎉 KONFETİ ANİMASYONLARI
+   ======================================== */
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0.3;
+    }
+}
+
+@keyframes confetti-explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ========================================
+   📝 TYPEWRİTER EFEKTİ
+   ======================================== */
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1.2em;
+    background: var(--gold);
+    margin-left: 5px;
+    animation: blink 0.8s infinite;
+    vertical-align: middle;
+}
+
+/* ========================================
+   🚪 KAPI AÇILMA ANİMASYONU
+   ======================================== */
+
+@keyframes doorOpen {
+    0% {
+        transform: perspective(400px) rotateY(0);
+    }
+    100% {
+        transform: perspective(400px) rotateY(-105deg);
+    }
+}
+
+.door.opening {
+    animation: doorOpen 0.8s ease forwards;
+    transform-origin: left center;
+}
+
+/* ========================================
+   ✨ PARILTMA EFEKTİ
+   ======================================== */
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+.shimmer-effect {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* ========================================
+   🌟 SÜPERNOVA PATLAMA
+   ======================================== */
+
+@keyframes supernova {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 
+            0 0 0 0 rgba(251, 191, 36, 1),
+            0 0 0 0 rgba(147, 51, 234, 1);
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+        box-shadow: 
+            0 0 50px 50px rgba(251, 191, 36, 0.5),
+            0 0 100px 100px rgba(147, 51, 234, 0.3);
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+        box-shadow: 
+            0 0 100px 100px rgba(251, 191, 36, 0),
+            0 0 200px 200px rgba(147, 51, 234, 0);
+    }
+}
+
+.supernova-effect {
+    animation: supernova 1.5s ease-out forwards;
+}
+
+/* ========================================
+   💫 YILDIZ DÖNÜŞÜMÜ
+   ======================================== */
+
+@keyframes starTransform {
+    0% {
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    50% {
+        filter: hue-rotate(180deg) brightness(1.5);
+    }
+    100% {
+        filter: hue-rotate(360deg) brightness(1);
+    }
+}
+
+/* ========================================
+   🎊 ZAFER KUTLAMA
+   ======================================== */
+
+@keyframes victory-bounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-20px) scale(1.1);
+    }
+    50% {
+        transform: translateY(0) scale(1);
+    }
+    75% {
+        transform: translateY(-10px) scale(1.05);
+    }
+}
+
+.victory-animation {
+    animation: victory-bounce 1s ease infinite;
+}
+
+/* ========================================
+   🔄 DÖNÜŞ ANİMASYONLARI
+   ======================================== */
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: rotate(360deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+/* ========================================
+   📱 RESPONSIVE ANİMASYONLAR
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (max-width: 768px) {
+    @keyframes starAppear {
+        0% {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .star-node {
+        animation-duration: 0.5s;
+    }
+}

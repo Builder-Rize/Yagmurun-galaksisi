@@ -1,0 +1,3554 @@
+/* ========================================
+   Yağmur'S GALAXY: ULTIMATE EDITION v3.0
+   Kraliçem için özel yapıldı 🤍
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* iOS Input Zoom Fix - Input font-size must be 16px to prevent zoom */
+@media screen and (max-width: 768px) {
+    input, 
+    textarea, 
+    select {
+        font-size: 16px !important;
+        touch-action: manipulation;
+    }
+    
+    /* Prevent double-tap zoom */
+    * {
+        touch-action: manipulation;
+    }
+    
+    /* Allow touch-action on interactive elements */
+    .star-point,
+    button,
+    .task-input,
+    .check-btn,
+    .next-btn {
+        touch-action: pan-y pinch-zoom;
+    }
+
+    /* Sürüklenen harfler: tarayıcı scroll/zoom için gesture'ı kapmasın,
+       yoksa touchmove sürükleme olarak çalışmaz */
+    .letter,
+    .dropped-letter {
+        touch-action: none;
+    }
+    
+    /* iOS momentum scrolling */
+    .modal-content,
+    .galaxy-map,
+    .big-bang-container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Prevent text size adjustment on orientation change */
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    height: 100%;
+    overflow: hidden; /* Sayfa seviyesinde scroll'u kapat */
+}
+
+:root {
+    --primary-purple: #9333ea;
+    --purple-light: #e9d5ff;
+    --purple-dark: #581c87;
+    --gold: #fbbf24;
+    --white: #ffffff;
+    --black: #000000;
+    --bg-dark: #1a0b2e;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at center, var(--bg-dark) 0%, var(--black) 70%);
+    color: var(--white);
+    overflow-x: hidden;
+    min-height: 100vh;
+    height: 100%;
+    overflow: hidden; /* Sayfa seviyesinde scroll'u kapat */
+}
+
+/* Canvas Arkaplan */
+#star-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* ========================================
+   🎮 GİRİŞ EKRANI
+   ======================================== */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero.hero-fade-out {
+    animation: heroFadeOut 0.65s ease forwards;
+}
+
+@keyframes heroFadeOut {
+    from {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(1.03);
+    }
+}
+
+.hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(80px, 15vw, 150px);
+    color: var(--white);
+    text-shadow: 
+        0 0 20px rgba(147, 51, 234, 0.8),
+        0 0 40px rgba(147, 51, 234, 0.6),
+        0 0 60px rgba(147, 51, 234, 0.4);
+    animation: pulse 3s ease-in-out infinite;
+    letter-spacing: 20px;
+}
+
+.hero .subtitle {
+    font-size: 24px;
+    color: var(--purple-light);
+    font-style: italic;
+    margin-top: 20px;
+    opacity: 0.9;
+}
+
+.love-whisper {
+    margin-top: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(14px, 2vw, 18px);
+    letter-spacing: 0.8px;
+    text-align: center;
+    min-height: 28px;
+    text-shadow: 0 0 18px rgba(192, 132, 252, 0.45);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    opacity: 1;
+}
+
+.love-whisper.fade-out {
+    opacity: 0;
+    transform: translateY(4px);
+}
+
+.discover-btn {
+    margin-top: 60px;
+    padding: 20px 60px;
+    border: 2px solid var(--primary-purple);
+    background: transparent;
+    color: var(--white);
+    font-size: 18px;
+    letter-spacing: 5px;
+    cursor: pointer;
+    animation: float 2s ease-in-out infinite;
+    transition: all 0.3s;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.discover-btn:hover {
+    background: var(--primary-purple);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.8);
+}
+
+/* ========================================
+   ⭐ YILDIZ HARİTASI
+   ======================================== */
+.galaxy-map {
+    min-height: 100vh;
+    position: relative;
+    padding: 100px 20px;
+}
+
+.section-title {
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    color: var(--purple-light);
+    margin-bottom: 50px;
+    text-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
+.stars-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 800px;
+    margin: 0 auto;
+}
+
+/* Yıldız Noktaları */
+.star-point {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Space Grotesk', sans-serif;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    will-change: transform, box-shadow;
+}
+
+/* Aktif Yıldız */
+.star-point.active {
+    background: radial-gradient(circle, var(--primary-purple) 0%, var(--purple-dark) 100%);
+    box-shadow: 
+        0 0 20px rgba(147, 51, 234, 0.8),
+        0 0 40px rgba(147, 51, 234, 0.4);
+    animation: starPulse 2s ease-in-out infinite;
+    color: var(--white);
+}
+
+/* Kilitli Yıldız */
+.star-point.locked {
+    background: #374151;
+    opacity: 0.3;
+    pointer-events: none;
+    color: #6b7280;
+}
+
+/* Açılan yıldızlar - Beyaz Neon Yıldız */
+.star-point.completed {
+    background: radial-gradient(circle, #ffffff 0%, #e9d5ff 50%, #9333ea 100%);
+    box-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.8),
+        0 0 60px rgba(255, 255, 255, 0.5),
+        0 0 90px rgba(147, 51, 234, 0.3);
+    animation: whiteGlow 2s ease-in-out infinite;
+    color: #581c87;
+    font-weight: bold;
+}
+
+.star-point.completed::before {
+    content: '✦';
+    position: absolute;
+    font-size: 28px;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    animation: starTwinkle 1.5s ease-in-out infinite;
+}
+
+@keyframes whiteGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(255, 255, 255, 0.8),
+            0 0 60px rgba(255, 255, 255, 0.5),
+            0 0 90px rgba(147, 51, 234, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 50px rgba(255, 255, 255, 1),
+            0 0 80px rgba(255, 255, 255, 0.7),
+            0 0 110px rgba(147, 51, 234, 0.5);
+    }
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* AŞK YILDIZI (6. Yıldız) */
+.star-point.love-star {
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle, var(--gold) 0%, #b45309 100%);
+    box-shadow: 
+        0 0 30px rgba(251, 191, 36, 0.9),
+        0 0 60px rgba(251, 191, 36, 0.5);
+    animation: goldPulse 1.5s ease-in-out infinite;
+}
+
+.star-point.love-star::after {
+    content: "AŞK YILDIZI";
+    position: absolute;
+    bottom: -30px;
+    font-size: 10px;
+    color: var(--gold);
+    white-space: nowrap;
+    letter-spacing: 2px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Altın Yıldız (11. Yıldız) */
+.star-point.golden-star {
+    background: radial-gradient(circle, #fbbf24 0%, #d97706 100%);
+    box-shadow: 
+        0 0 25px rgba(251, 191, 36, 0.8),
+        0 0 50px rgba(251, 191, 36, 0.4);
+    animation: goldPulse 2s ease-in-out infinite;
+}
+
+/* Geleceğin Yıldızı (12) */
+.star-point.future-star::after {
+    content: "GELECEĞİN YILDIZI";
+    position: absolute;
+    bottom: -30px;
+    font-size: 10px;
+    color: var(--white);
+    white-space: nowrap;
+    letter-spacing: 2px;
+}
+
+/* Yıldız açılış efekti (parlama) */
+.star-opening {
+    animation: starOpenFlash 0.8s ease-out;
+}
+
+@keyframes starOpenFlash {
+    0% {
+        transform: scale(1) translate(-50%, -50%);
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.8);
+    }
+    50% {
+        transform: scale(1.4) translate(-50%, -50%);
+        box-shadow: 
+            0 0 60px rgba(147, 51, 234, 1),
+            0 0 120px rgba(147, 51, 234, 0.6),
+            0 0 180px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        transform: scale(1) translate(-50%, -50%);
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.8);
+    }
+}
+
+/* ========================================
+   🖼️ MODAL
+   ======================================== */
+.star-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    max-height: 90dvh; /* Dynamic viewport height for mobile */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
+    overscroll-behavior: contain; /* Prevent body scroll when at boundaries */
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--black) 100%);
+    border: 2px solid var(--primary-purple);
+    border-radius: 20px;
+    padding: 40px;
+    padding-bottom: 100px; /* Space for bottom content */
+    text-align: center;
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 0 50px rgba(147, 51, 234, 0.5);
+    animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    touch-action: pan-y; /* Allow vertical scroll, prevent horizontal */
+    box-sizing: border-box;
+    scrollbar-width: thin; /* Firefox thin scrollbar */
+}
+
+/* Custom scrollbar for WebKit browsers */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(147, 51, 234, 0.1);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.5);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(147, 51, 234, 0.8);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 36px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.3s;
+}
+
+.close-btn:hover {
+    opacity: 1;
+    color: var(--purple-light);
+    transform: scale(1.2);
+}
+
+#modal-body {
+    width: 100%;
+    max-height: calc(90vh - 100px);
+    max-height: calc(90dvh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+#modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    color: var(--purple-light);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
+.star-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-purple);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.6);
+    margin-bottom: 20px;
+}
+
+.romantic-message {
+    font-size: 17px;
+    line-height: 2;
+    color: #f3e8ff;
+    text-align: left;
+    white-space: pre-wrap;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+}
+
+/* ========================================
+   🎮 GÖREV STİLLERİ
+   ======================================== */
+
+/* Input Task */
+/* ========================================
+   ✨ YENİ INPUT STİLİ (v9.0)
+   ======================================== */
+
+.task-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px 20px;
+    margin: 20px auto;
+    display: block;
+    background: rgba(147, 51, 234, 0.1);
+    border: 2px solid rgba(147, 51, 234, 0.5);
+    border-radius: 25px;
+    color: #ffffff;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+}
+
+.task-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.task-input:focus {
+    border-color: #9333ea;
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+    background: rgba(147, 51, 234, 0.2);
+}
+
+/* Date input için özel */
+input[type="date"].task-input {
+    color-scheme: dark;
+}
+
+/* Şifreli Mesaj */
+.caesar-task .encrypted {
+    font-size: 36px;
+    color: var(--gold);
+    text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+    margin: 20px 0;
+    letter-spacing: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    background: rgba(251, 191, 36, 0.1);
+    padding: 15px 30px;
+    border-radius: 15px;
+    border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+/* İpucu - BELİRGİN */
+.hint {
+    color: #fbbf24;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 15px 0;
+    text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(251, 191, 36, 0.1);
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hint::before {
+    content: '💡';
+    font-size: 22px;
+    animation: pulse 2s infinite;
+}
+
+/* Butonlar */
+/* ========================================
+   ✨ GÜZELLEŞTİRİLMİŞ BUTONLAR
+   ======================================== */
+
+.complete-btn, .check-btn, .task-btn {
+    padding: 16px 45px;
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 50%, #581c87 100%);
+    border: none;
+    border-radius: 50px;
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 2px;
+    box-shadow: 
+        0 10px 25px rgba(147, 51, 234, 0.4),
+        0 0 0 2px rgba(147, 51, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.complete-btn::before, .check-btn::before, .task-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.complete-btn:hover::before, .check-btn:hover::before, .task-btn:hover::before {
+    left: 100%;
+}
+
+.complete-btn:hover, .check-btn:hover, .task-btn:hover {
+    transform: scale(1.08) translateY(-3px);
+    box-shadow: 
+        0 15px 35px rgba(147, 51, 234, 0.6),
+        0 0 0 3px rgba(147, 51, 234, 0.3);
+}
+
+.complete-btn:active, .check-btn:active, .task-btn:active {
+    transform: scale(1.02) translateY(-1px);
+}
+
+/* ========================================
+   ✨ HOLD BUTONU - DÜZELTİLMİŞ
+   ======================================== */
+
+.hold-task {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
+.hold-btn {
+    width: 240px;
+    height: 65px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    border: none;
+    border-radius: 50px;
+    color: #1a0b2e;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 3px;
+    box-shadow: 
+        0 10px 30px rgba(251, 191, 36, 0.4),
+        0 0 0 3px rgba(251, 191, 36, 0.2);
+    text-transform: uppercase;
+    order: 1;
+}
+
+.hold-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        0 15px 40px rgba(251, 191, 36, 0.6),
+        0 0 0 4px rgba(251, 191, 36, 0.3);
+}
+
+.hold-btn:active {
+    transform: scale(0.98);
+}
+
+.progress-bar {
+    width: 240px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    order: 2;
+    margin: 0 auto;
+}
+
+.progress-bar .progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+    border-radius: 10px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+}
+
+/* XOX Oyunu */
+.xox-task {
+    margin-top: 20px;
+}
+
+/* ========================================
+   ✨ XOX OYUNU - GÜZELLEŞTİRİLMİŞ
+   ======================================== */
+
+.xox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 90px);
+    gap: 12px;
+    justify-content: center;
+    margin: 25px auto;
+    padding: 15px;
+    background: rgba(147, 51, 234, 0.05);
+    border-radius: 20px;
+    border: 2px solid rgba(147, 51, 234, 0.2);
+}
+
+.cell {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(0, 0, 0, 0.2));
+    border: 2px solid rgba(147, 51, 234, 0.4);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cell:hover {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(0, 0, 0, 0.1));
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(147, 51, 234, 0.3);
+    border-color: rgba(147, 51, 234, 0.6);
+}
+
+.cell.x-mark {
+    color: #c084fc;
+    text-shadow: 0 0 20px rgba(192, 132, 252, 0.8);
+    background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(0, 0, 0, 0.1));
+    border-color: rgba(192, 132, 252, 0.6);
+}
+
+.cell.o-mark {
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(0, 0, 0, 0.1));
+    border-color: rgba(251, 191, 36, 0.6);
+}
+
+.game-status {
+    color: var(--purple-light);
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 15px;
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+    font-style: italic;
+}
+
+/* Memory Oyunu */
+/* ========================================
+   ✨ MEMORY OYUNU - GÜZELLEŞTİRİLMİŞ
+   ======================================== */
+
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 110px);
+    gap: 18px;
+    justify-content: center;
+    margin: 25px auto;
+    padding: 20px;
+    background: rgba(147, 51, 234, 0.05);
+    border-radius: 20px;
+    border: 2px solid rgba(147, 51, 234, 0.2);
+}
+
+.memory-card {
+    width: 110px;
+    height: 110px;
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 50%, #581c87 100%);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+        0 8px 20px rgba(147, 51, 234, 0.3),
+        0 0 0 2px rgba(147, 51, 234, 0.2);
+}
+
+.memory-card:hover {
+    transform: scale(1.08) rotate(3deg);
+    box-shadow: 
+        0 12px 30px rgba(147, 51, 234, 0.5),
+        0 0 0 3px rgba(147, 51, 234, 0.4);
+}
+
+.memory-card.flipped {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(147, 51, 234, 0.1));
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.memory-card.matched {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    box-shadow: 
+        0 8px 25px rgba(34, 197, 94, 0.4),
+        0 0 0 3px rgba(34, 197, 94, 0.3);
+    animation: matchPulse 0.5s ease;
+}
+
+.memory-card.flipped {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotateY(180deg);
+}
+
+.memory-card.matched {
+    background: #22c55e;
+    animation: matchPulse 0.5s ease;
+}
+
+/* Drag Drop */
+/* ========================================
+   ✨ DRAG & DROP (A-Z-R-A) - GÜZELLEŞTİRİLMİŞ
+   ======================================== */
+
+.drag-task {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.drop-zone {
+    width: 280px;
+    height: 80px;
+    border: 3px dashed rgba(147, 51, 234, 0.6);
+    border-radius: 20px;
+    margin: 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 12px;
+    color: #e9d5ff;
+    background: rgba(147, 51, 234, 0.08);
+    transition: all 0.3s;
+    box-shadow: inset 0 0 20px rgba(147, 51, 234, 0.1);
+}
+
+.drop-zone:has(.letter) {
+    border-color: rgba(147, 51, 234, 0.9);
+    background: rgba(147, 51, 234, 0.15);
+    box-shadow: 
+        inset 0 0 30px rgba(147, 51, 234, 0.2),
+        0 0 30px rgba(147, 51, 234, 0.2);
+}
+
+.letters-pool {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(147, 51, 234, 0.05);
+    border-radius: 20px;
+    border: 2px solid rgba(147, 51, 234, 0.2);
+}
+
+.letter {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 50%, #581c87 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: grab;
+    color: white;
+    box-shadow: 
+        0 8px 20px rgba(147, 51, 234, 0.4),
+        0 0 0 2px rgba(147, 51, 234, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.letter:hover {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 
+        0 12px 30px rgba(147, 51, 234, 0.6),
+        0 0 0 3px rgba(147, 51, 234, 0.4);
+}
+
+.letter:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+/* Final Big Bang */
+.big-bang-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, var(--bg-dark) 0%, var(--black) 100%);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.flash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    animation: flashAnim 2s ease-out forwards;
+}
+
+.final-content {
+    text-align: center;
+    padding: 40px;
+    z-index: 10;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 100px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.final-content h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 6vw, 48px);
+    color: var(--white);
+    text-shadow: 0 0 30px rgba(147, 51, 234, 0.8);
+    margin-bottom: 30px;
+    animation: pulse 2s infinite;
+}
+
+.typewriter-text {
+    font-size: 18px;
+    color: var(--purple-light);
+    max-width: 800px;
+    line-height: 1.8;
+    min-height: 200px;
+    margin: 0 auto;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 50vh;
+    max-height: 50dvh;
+    padding: 0 20px 50px 20px;
+}
+
+#confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Kalp Yağmuru */
+#hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+    overflow: hidden;
+}
+
+.falling-heart {
+    position: absolute;
+    font-size: 24px;
+    animation: fall linear forwards;
+}
+
+/* Altın Flaş Efekti */
+.golden-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--gold);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10000;
+    animation: flashAnim 1s ease-out forwards;
+}
+
+/* ========================================
+   🎬 ANİMASYONLAR
+   ======================================== */
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes starPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.8); 
+    }
+    50% { 
+        transform: scale(1.1); 
+        box-shadow: 0 0 40px rgba(147, 51, 234, 1); 
+    }
+}
+
+@keyframes goldPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.9); 
+    }
+    50% { 
+        transform: scale(1.15); 
+        box-shadow: 0 0 60px rgba(251, 191, 36, 1); 
+    }
+}
+
+@keyframes modalPop {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.5); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+@keyframes flashAnim {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+}
+
+@keyframes fall {
+    to { 
+        transform: translateY(100vh) rotate(360deg); 
+    }
+}
+
+@keyframes matchPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* ========================================
+   🎵 MÜZİK KONTROL
+   ======================================== */
+.music-control {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: rgba(147, 51, 234, 0.3);
+    border: 2px solid #9333ea;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.music-control:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.8);
+}
+
+.music-control.muted {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+/* ========================================
+   ✨ BAŞARI EKRANI (Fotoğraf + Mesaj)
+   ======================================== */
+.success-area {
+    animation: fadeIn 0.5s ease;
+    text-align: center;
+}
+
+.star-photo-large {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #9333ea;
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.8);
+    margin-bottom: 25px;
+    animation: starPulse 2s infinite;
+}
+
+.message-box {
+    background: rgba(147, 51, 234, 0.15);
+    border: 2px solid rgba(147, 51, 234, 0.4);
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    max-height: 250px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.message-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.message-box::-webkit-scrollbar-track {
+    background: rgba(147, 51, 234, 0.1);
+    border-radius: 4px;
+}
+
+.message-box::-webkit-scrollbar-thumb {
+    background: #9333ea;
+    border-radius: 4px;
+}
+
+.next-btn {
+    background: linear-gradient(135deg, #9333ea 0%, #581c87 100%);
+    color: white;
+    border: none;
+    padding: 18px 50px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: all 0.3s;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 2px;
+    box-shadow: 0 10px 30px rgba(147, 51, 234, 0.4);
+}
+
+.next-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.6);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   💥 SÜPERNOVA ANİMASYONU
+   ======================================== */
+.mini-supernova {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.mini-supernova::before {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #fbbf24 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: novaFlash 0.6s ease-out forwards;
+}
+
+.nova-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--color);
+    border-radius: 50%;
+    animation: novaBurst 0.6s ease-out forwards;
+    transform: rotate(var(--angle)) translateX(0);
+}
+
+@keyframes novaFlash {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+@keyframes novaBurst {
+    0% { transform: rotate(var(--angle)) translateX(0) scale(1); opacity: 1; }
+    100% { transform: rotate(var(--angle)) translateX(40px) scale(0); opacity: 0; }
+}
+
+/* ========================================
+   📱 RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .hero h1 {
+        letter-spacing: 10px;
+    }
+    
+    .stars-container {
+        height: 600px;
+    }
+    
+    .star-point {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .star-point.love-star {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .modal-content {
+        padding: 30px 20px;
+        width: 95%;
+    }
+    
+    .star-photo {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .xox-grid {
+        grid-template-columns: repeat(3, 75px);
+        gap: 10px;
+        padding: 12px;
+    }
+    
+    .cell {
+        width: 75px;
+        height: 75px;
+        font-size: 32px;
+    }
+    
+    .input-task input, .password-task input, .caesar-task input, .date-task input {
+        width: 90%;
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+    
+    .complete-btn, .check-btn, .task-btn {
+        padding: 14px 35px;
+        font-size: 16px;
+    }
+    
+    .hold-btn {
+        width: 200px;
+        height: 55px;
+        font-size: 16px;
+    }
+    
+    .memory-grid {
+        grid-template-columns: repeat(2, 90px);
+        gap: 12px;
+    }
+    
+    .memory-card {
+        width: 90px;
+        height: 90px;
+        font-size: 38px;
+    }
+    
+    .letter {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+    }
+    
+    .drop-zone {
+        width: 240px;
+        height: 70px;
+        font-size: 28px;
+    }
+}
+
+
+/* ========================================
+   💕 ROMANTİK EFEKTLER - Yağmur'YA ÖZEL
+   ======================================== */
+
+/* 🌸 Sürekli Arka Plan Kalp Yağmuru */
+.floating-heart {
+    position: fixed;
+    font-size: 20px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatHeart 8s ease-in infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes floatHeart {
+    0% {
+        transform: translateY(100vh) rotate(0deg) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* ⭐ Yıldız Etrafında Dönen Halka */
+.star-ring {
+    position: absolute;
+    border: 2px solid rgba(192, 132, 252, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: rotateRing 8s linear infinite;
+    will-change: transform;
+}
+
+.star-ring::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, #ffffff, #c084fc);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes rotateRing {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ✨ Yıldız Parıltı Efekti */
+.star-sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkle 2s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        opacity: 0; 
+        transform: scale(0) rotate(0deg); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1) rotate(180deg); 
+        box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* 💫 Mouse İzleyici Parıltı */
+.cursor-trail {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(192, 132, 252, 0.6));
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: trailFade 1s ease-out forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes trailFade {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0) translateY(-20px);
+        opacity: 0;
+    }
+}
+
+/* 🌹 Romantik Mesaj Kutusu Glow */
+.message-box {
+    position: relative;
+}
+
+.message-box::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: linear-gradient(45deg, #c084fc, #9333ea, #ffffff, #c084fc);
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: gradientRotate 3s ease infinite;
+    opacity: 0.7;
+}
+
+@keyframes gradientRotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 💖 12. Yıldız - Aşk Yıldızı Özel Efekt */
+.star-point.future-star.love-star {
+    animation: loveStarPulse 2s ease-in-out infinite;
+}
+
+@keyframes loveStarPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(255, 105, 180, 0.6),
+            0 0 60px rgba(255, 105, 180, 0.4),
+            inset 0 0 20px rgba(255, 182, 193, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 50px rgba(255, 105, 180, 0.9),
+            0 0 100px rgba(255, 105, 180, 0.6),
+            inset 0 0 30px rgba(255, 182, 193, 0.5);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* 🎆 Supernova Geliştirilmiş */
+.supernova-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* 💕 Kalp Patlama Efekti */
+.heart-burst {
+    position: fixed;
+    font-size: 24px;
+    pointer-events: none;
+    z-index: 1001;
+    animation: heartBurst 1.5s ease-out forwards;
+}
+
+@keyframes heartBurst {
+    0% {
+        transform: translate(0, 0) scale(0.5) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 🌟 Yıldız Tıklama Efekti */
+.star-click-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9), transparent);
+    pointer-events: none;
+    animation: starClickRipple 0.6s ease-out forwards;
+}
+
+@keyframes starClickRipple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+    }
+}
+
+/* 🎭 Final Sayfası Kalp Yağmuru */
+.final-heart-rain {
+    position: fixed;
+    top: 0;
+    font-size: 30px;
+    pointer-events: none;
+    /* Final modal 10000'de; kalpler onun üstünde görünmeli */
+    z-index: 10005;
+    animation: finalHeartFall 3s ease-in forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes finalHeartFall {
+    0% {
+        transform: translateY(-50px) rotate(0deg) scale(0.8);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* ✨ Yıldız Çevresi Parçacıkları */
+.star-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: particleFloat 3s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(var(--moveX), var(--moveY)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* 🌙 Galaksi Ambiyans Işıltı */
+.galaxy-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    animation: galaxyPulse 10s ease-in-out infinite;
+}
+
+@keyframes galaxyPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* 💝 Açık Yıldızda Kalp Efekti */
+.completed-heart {
+    position: absolute;
+    font-size: 12px;
+    animation: completedHeartFloat 2s ease-in-out infinite;
+}
+
+@keyframes completedHeartFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-15px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+
+/* ========================================
+   🎉 12. YILDIZ FİNAL EKRANI - ULTRA SCROLL FIX
+   ======================================== */
+
+/* 12. Yıldız Ana Container - TAM EKRAN */
+.final-message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh; /* Dynamic viewport height - KRİTİK */
+    max-height: 100dvh;
+    z-index: 9999;
+    
+    /* Scroll özellikleri */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
+    overscroll-behavior: contain;
+    
+    /* İçerik hizalama */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    
+    /* Güvenli alanlar (iPhone notch vb.) */
+    padding: 20px;
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 200px); /* KRİTİK: Son cümle için bol boşluk */
+    
+    /* Arka plan */
+    background: linear-gradient(180deg, 
+        rgba(26, 11, 46, 0.98) 0%, 
+        rgba(75, 0, 130, 0.95) 50%,
+        rgba(147, 51, 234, 0.90) 100%);
+    backdrop-filter: blur(10px);
+    
+    box-sizing: border-box;
+}
+
+/* 12. Yıldız Özel Container - AGRESİF SCROLL FIX */
+.star-12-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: fit-content;
+    max-height: none; /* Sınır koyma - içerik kadar büyü */
+    overflow: visible;
+    padding: 20px;
+    padding-bottom: 300px; /* Son cümlenin görünmesi için BOL boşluk */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+}
+
+/* Final Başarı Alanı */
+.final-success {
+    position: relative;
+    animation: finalGlow 2s ease-in-out infinite;
+    height: auto;
+    min-height: fit-content;
+    max-height: none; /* Sınır kaldırıldı - içerik kadar büyü */
+    overflow: visible; /* İçerik kesilmesin */
+    padding-right: 10px;
+    padding-bottom: 100px;
+    touch-action: pan-y;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Final success içindeki tüm elementler için pointer events */
+.final-success * {
+    pointer-events: auto;
+}
+
+@keyframes finalGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.4));
+    }
+    50% {
+        filter: drop-shadow(0 0 40px rgba(255, 105, 180, 0.8));
+    }
+}
+
+/* Final Fotoğraf */
+.final-photo {
+    border: 3px solid rgba(255, 182, 193, 0.6);
+    box-shadow: 
+        0 0 30px rgba(255, 105, 180, 0.6),
+        0 0 60px rgba(255, 105, 180, 0.4);
+    animation: finalPhotoPulse 3s ease-in-out infinite;
+}
+
+@keyframes finalPhotoPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 
+            0 0 30px rgba(255, 105, 180, 0.6),
+            0 0 60px rgba(255, 105, 180, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 
+            0 0 50px rgba(255, 105, 180, 0.9),
+            0 0 100px rgba(255, 105, 180, 0.6);
+    }
+}
+
+/* Final Mesaj Kutusu */
+.final-message-box {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 182, 193, 0.1) 50%,
+        rgba(147, 51, 234, 0.1) 100%);
+    border: 2px solid rgba(255, 182, 193, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Final Mesaj Kutusu */
+.final-message-box {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 182, 193, 0.1) 50%,
+        rgba(147, 51, 234, 0.1) 100%);
+    border: 2px solid rgba(255, 182, 193, 0.4);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
+.final-message-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* ========================================
+   💝 12. YILDIZ - ÖZEL TASARIM v3.0
+   ======================================== */
+
+/* Final Metin İçeriği Wrapper - KRİTİK SCROLL ALANI */
+.final-text-content {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    
+    /* Scroll için */
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Metin stil */
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    
+    /* Boşluklar - ÇOK ÖNEMLİ */
+    padding: 20px 15px 250px 15px; /* Altta 250px boşluk = son cümle garanti görünür */
+    box-sizing: border-box;
+    
+    /* Satır sonu */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap; /* Satır sonlarını koru */
+}
+
+/* Custom scrollbar */
+.final-text-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.final-text-content::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.final-text-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff69b4, #ffd700);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+/* 12. Yıldız Ana Container */
+.star-12-wrapper {
+    width: 100%;
+    height: auto;
+    min-height: fit-content;
+    position: relative;
+    z-index: 100;
+}
+
+/* Final Mesaj Metni - 12. Yıldız Özel */
+.final-message {
+    font-size: 17px;
+    line-height: 2;
+    color: #ffffff;
+    text-align: left;
+    position: relative;
+    z-index: 20;
+    overflow: visible;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* 12. Yıldız Metin İçeriği */
+.final-text-content {
+    min-height: fit-content;
+    overflow: visible;
+    position: relative;
+    z-index: 25;
+    padding-bottom: 150px; /* "Bitanemmm Yağmurmmm..." için kritik */
+}
+
+/* Başlık - 12. Yıldız */
+.final-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffd700; /* Altın sarısı */
+    text-shadow: 
+        0 0 20px rgba(255,215,0,0.8), 
+        0 0 40px rgba(255,105,180,0.6);
+    margin: 20px 0 30px 0;
+    text-align: center;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,105,180,0.6);
+    }
+    to {
+        text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,105,180,0.8);
+    }
+}
+
+/* Paragraflar */
+.final-message .para {
+    margin-bottom: 25px;
+    line-height: 2;
+    color: #fff0f5;
+}
+
+/* Son Cümle - Aşk İtirafı */
+.final-love-declaration {
+    font-size: 1.3rem;
+    color: #ff69b4; /* Hot pink */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 50px; /* En altta garanti boşluk */
+    padding: 20px;
+    padding-bottom: 100px; /* Kesilmemesi garanti */
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    border: 2px solid rgba(255,105,180,0.5);
+    box-shadow: 0 0 30px rgba(255,105,180,0.4);
+    line-height: 2;
+    text-shadow: 0 0 10px rgba(255,105,180,0.8);
+    animation: heartbeat 1.5s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+}
+
+.love-declaration {
+    font-size: 1.4em;
+    color: #ff1493;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 40px;
+    padding: 25px;
+    padding-bottom: 150px; /* Kesilmemesi garanti */
+    text-shadow: 
+        0 0 10px rgba(255,20,147,0.8),
+        0 0 20px rgba(255,20,147,0.6),
+        0 0 30px rgba(255,20,147,0.4);
+    animation: heartbeat 1.5s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+    background: rgba(255,20,147,0.1);
+    border-radius: 20px;
+    border: 2px solid rgba(255,20,147,0.3);
+}
+
+/* Kalp Atışı Animasyonu */
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    10% { transform: scale(1.05); }
+    20% { transform: scale(1); }
+    30% { transform: scale(1.05); }
+    40% { transform: scale(1); }
+}
+
+/* Yazı Parıltı Animasyonu */
+@keyframes textGlow {
+    from { 
+        text-shadow: 
+            0 0 10px rgba(255,20,147,0.8),
+            0 0 20px rgba(255,20,147,0.6);
+    }
+    to { 
+        text-shadow: 
+            0 0 20px rgba(255,20,147,1),
+            0 0 30px rgba(255,20,147,0.8),
+            0 0 40px rgba(255,20,147,0.6);
+    }
+}
+
+/* Typewriter Efekti için Cursor */
+.typewriter-cursor {
+    border-right: 3px solid #ff69b4;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { border-color: transparent; }
+    50% { border-color: #ff69b4; }
+}
+
+@keyframes textShine {
+    to { background-position: 200% center; }
+}
+
+/* Final Buton */
+.final-btn {
+    background: linear-gradient(135deg, #ec4899 0%, #9333ea 50%, #fbbf24 100%);
+    background-size: 200% 200%;
+    animation: finalBtnGradient 3s ease infinite;
+    font-size: 20px;
+    padding: 18px 40px;
+    box-shadow: 
+        0 0 30px rgba(236, 72, 153, 0.6),
+        0 10px 40px rgba(147, 51, 234, 0.4);
+}
+
+@keyframes finalBtnGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.final-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 0 50px rgba(236, 72, 153, 0.9),
+        0 15px 50px rgba(147, 51, 234, 0.6);
+}
+
+/* Modal Arka Planı Parıltı */
+#star-modal .star-sparkle {
+    position: absolute;
+    background: radial-gradient(circle, #ffffff 0%, #fbbf24 50%, transparent 100%);
+    border-radius: 50%;
+    animation: modalSparkle 2s ease-in-out infinite;
+}
+
+@keyframes modalSparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+        box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.8);
+    }
+}
+
+
+/* ========================================
+   🌹 BIG BANG FİNAL EKRANI EKSTRA EFEKTLER
+   ======================================== */
+
+@keyframes roseFloat {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.9;
+    }
+    90% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(-110vh) rotate(720deg) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Final Ekranı Glow */
+.big-bang-container {
+    background: radial-gradient(ellipse at center, 
+        rgba(147, 51, 234, 0.3) 0%, 
+        rgba(0, 0, 0, 0.95) 70%);
+}
+
+.final-content h1 {
+    animation: titleGlow 2s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 
+            0 0 20px rgba(255, 255, 255, 0.8),
+            0 0 40px rgba(147, 51, 234, 0.6),
+            0 0 60px rgba(255, 105, 180, 0.4);
+    }
+    50% {
+        text-shadow: 
+            0 0 30px rgba(255, 255, 255, 1),
+            0 0 60px rgba(147, 51, 234, 0.9),
+            0 0 90px rgba(255, 105, 180, 0.7);
+    }
+}
+
+/* Typewriter imleci */
+.typewriter-text::after {
+    content: '|';
+    animation: blink 1s infinite;
+    color: #fbbf24;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+
+/* ========================================
+   ✨ EXTRA ROMANTİK EFEKTLER - Yağmur'YA ÖZEL v2.0
+   ======================================== */
+
+/* 🌟 Yıldızlar Arası Hafif Parıltı Bağlantıları */
+.star-connection-glow {
+    position: absolute;
+    width: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(192, 132, 252, 0.3) 20%, 
+        rgba(255, 255, 255, 0.6) 50%, 
+        rgba(192, 132, 252, 0.3) 80%, 
+        transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    animation: connectionPulse 3s ease-in-out infinite;
+}
+
+@keyframes connectionPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* 💫 Yıldız Hover Efekti - Büyüme ve Parıltı */
+.star-point {
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.star-point:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+    filter: brightness(1.3);
+}
+
+.star-point.active:hover {
+    box-shadow: 
+        0 0 40px rgba(147, 51, 234, 1),
+        0 0 80px rgba(147, 51, 234, 0.6),
+        0 0 120px rgba(192, 132, 252, 0.4);
+}
+
+/* 🎵 Müzik Notası Efekti */
+.floating-note {
+    position: fixed;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: noteFloat 4s ease-out forwards;
+    opacity: 0.8;
+}
+
+@keyframes noteFloat {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.9;
+        transform: translateY(-30px) translateX(10px) rotate(20deg) scale(1);
+    }
+    100% {
+        transform: translateY(-200px) translateX(50px) rotate(45deg) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* 🌈 Işık Huzmeleri */
+.light-ray {
+    position: fixed;
+    width: 2px;
+    height: 100vh;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.1) 20%,
+        rgba(192, 132, 252, 0.3) 50%,
+        rgba(255, 255, 255, 0.1) 80%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    transform-origin: top center;
+    animation: rayRotate 20s linear infinite;
+}
+
+@keyframes rayRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 🔮 Bokeh Efekti - Bulanık Parlamalar */
+.bokeh {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(20px);
+    pointer-events: none;
+    z-index: 0;
+    animation: bokehFloat 15s ease-in-out infinite;
+}
+
+@keyframes bokehFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+    }
+    33% {
+        transform: translate(30px, -30px) scale(1.2);
+        opacity: 0.6;
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.8);
+        opacity: 0.3;
+    }
+}
+
+/* ⭐ Süper Parıltı Yıldızı */
+.super-sparkle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.super-sparkle::before,
+.super-sparkle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: linear-gradient(90deg, transparent, white, transparent);
+    transform: translate(-50%, -50%);
+}
+
+.super-sparkle::before {
+    width: 100%;
+    height: 2px;
+    animation: sparkleRotate 4s linear infinite;
+}
+
+.super-sparkle::after {
+    width: 2px;
+    height: 100%;
+    animation: sparkleRotate 4s linear infinite;
+}
+
+@keyframes sparkleRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 💝 Kalp Atışı Efekti */
+.heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    10% { transform: translate(-50%, -50%) scale(1.1); }
+    20% { transform: translate(-50%, -50%) scale(1); }
+    30% { transform: translate(-50%, -50%) scale(1.1); }
+    40% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 🌸 Yaprak Düşüşü */
+.falling-petal {
+    position: fixed;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 3;
+    animation: petalFall 6s ease-in-out forwards;
+}
+
+@keyframes petalFall {
+    0% {
+        transform: translateY(-50px) rotate(0deg) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg) translateX(100px);
+        opacity: 0;
+    }
+}
+
+/* ✨ Yıldız Tıklama Dalga Efekti */
+.click-ripple {
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: clickRipple 1s ease-out forwards;
+}
+
+@keyframes clickRipple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 150px;
+        height: 150px;
+        opacity: 0;
+    }
+}
+
+/* 🎆 Gradient Arka Plan Animasyonu */
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, 
+        #1a0b2e 0%, 
+        #2d1b4e 25%, 
+        #1a0b2e 50%, 
+        #3d1b6e 75%, 
+        #1a0b2e 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    z-index: -2;
+    opacity: 0.5;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 💫 Nebula Efekti */
+.nebula {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, 
+        rgba(147, 51, 234, 0.2) 0%, 
+        rgba(192, 132, 252, 0.1) 40%, 
+        transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(40px);
+    animation: nebulaFloat 20s ease-in-out infinite;
+}
+
+@keyframes nebulaFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(50px, -30px) scale(1.1);
+    }
+    50% {
+        transform: translate(20px, 40px) scale(0.9);
+    }
+    75% {
+        transform: translate(-40px, 20px) scale(1.05);
+    }
+}
+
+/* 🌟 Yıldız Parıltısı - Farklı Boyutlar */
+.twinkle-small {
+    animation: twinkleSmall 2s ease-in-out infinite;
+}
+
+.twinkle-medium {
+    animation: twinkleMedium 3s ease-in-out infinite;
+}
+
+.twinkle-large {
+    animation: twinkleLarge 4s ease-in-out infinite;
+}
+
+@keyframes twinkleSmall {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes twinkleMedium {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.3); }
+}
+
+@keyframes twinkleLarge {
+    0%, 100% { opacity: 0.5; transform: scale(1.2); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* 💕 Aşk Enerjisi Halkası */
+.love-energy-ring {
+    position: absolute;
+    border: 3px solid transparent;
+    border-top-color: rgba(255, 105, 180, 0.6);
+    border-right-color: rgba(147, 51, 234, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: loveEnergyRotate 3s linear infinite;
+}
+
+@keyframes loveEnergyRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 🎇 Gökkuşağı Parıltısı */
+.rainbow-glow {
+    animation: rainbowGlow 4s linear infinite;
+}
+
+@keyframes rainbowGlow {
+    0% { filter: hue-rotate(0deg) brightness(1.2); }
+    100% { filter: hue-rotate(360deg) brightness(1.2); }
+}
+
+
+/* ========================================
+   💖 GİRİŞ EKRANI EXTRA ROMANTİK EFEKTLER
+   ======================================== */
+
+/* Hero arka plan animasyonu */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, 
+        transparent 0%, 
+        rgba(147, 51, 234, 0.1) 30%, 
+        transparent 70%);
+    animation: heroPulse 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes heroPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Yağmur yazısı parıltı */
+.hero h1 {
+    position: relative;
+    animation: titleFloat 3s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero h1::after {
+    content: 'Yağmur';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.8) 50%, 
+        transparent 100%);
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: textShine 3s linear infinite;
+    pointer-events: none;
+}
+
+/* Subtitle parıltı */
+.subtitle {
+    position: relative;
+    animation: subtitleGlow 2s ease-in-out infinite;
+}
+
+@keyframes subtitleGlow {
+    0%, 100% { 
+        text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+    }
+    50% { 
+        text-shadow: 0 0 20px rgba(192, 132, 252, 0.9), 0 0 40px rgba(147, 51, 234, 0.5);
+    }
+}
+
+/* Keşfet butonu extra efekt */
+.discover-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        transparent 70%);
+    transform: rotate(45deg);
+    animation: btnShine 3s infinite;
+}
+
+@keyframes btnShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.discover-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 
+        0 0 30px rgba(147, 51, 234, 0.8),
+        0 0 60px rgba(192, 132, 252, 0.5),
+        0 0 90px rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   🎆 BIG BANG FİNAL EXTRA EFEKTLER
+   ======================================== */
+
+/* Final ekranı arka plan */
+.big-bang-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(192, 132, 252, 0.2) 0%, transparent 70%);
+    animation: finalBgPulse 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes finalBgPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Final başlık */
+.final-content h1 {
+    background: linear-gradient(90deg, #ffffff, #fbbf24, #ffffff, #c084fc, #ffffff);
+    background-size: 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowText 4s linear infinite;
+    text-shadow: none;
+}
+
+@keyframes rainbowText {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* Kalp atışı büyütme efekti */
+@keyframes heartBeatLarge {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.3); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.3); }
+    70% { transform: scale(1); }
+}
+
+.final-content h1::before,
+.final-content h1::after {
+    content: '🤍';
+    display: inline-block;
+    animation: heartBeatLarge 1.5s ease-in-out infinite;
+    margin: 0 15px;
+}
+
+/* Typewriter metni parıltı */
+.typewriter-text {
+    font-size: 24px;
+    line-height: 1.8;
+    background: linear-gradient(90deg, #e9d5ff, #ffffff, #fbbf24, #ffffff, #e9d5ff);
+    background-size: 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: textGlow 5s linear infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% { 
+        background-position: 0% 50%;
+        filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.5));
+    }
+    50% { 
+        background-position: 100% 50%;
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+}
+
+/* Parlama overlay */
+.flash-overlay {
+    animation: flashPulse 2s ease-in-out infinite;
+}
+
+@keyframes flashPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* ========================================
+   🌟 GALAXY MAP EXTRA EFEKTLER
+   ======================================== */
+
+/* Section title parıltı */
+.section-title {
+    position: relative;
+    animation: sectionTitleFloat 4s ease-in-out infinite;
+}
+
+@keyframes sectionTitleFloat {
+    0%, 100% { 
+        transform: translateY(0);
+        text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+    }
+    50% { 
+        transform: translateY(-5px);
+        text-shadow: 0 0 40px rgba(192, 132, 252, 0.9), 0 0 80px rgba(147, 51, 234, 0.5);
+    }
+}
+
+/* Yıldızlar konteyneri */
+.stars-container {
+    position: relative;
+}
+
+.stars-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    animation: containerGlow 6s ease-in-out infinite;
+}
+
+@keyframes containerGlow {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+
+/* ========================================
+   📱 MOBİL UYUMLULUK - RESPONSIVE
+   ======================================== */
+
+/* 768px ve altı - Tablet */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 60px;
+    }
+    
+    .subtitle {
+        font-size: 20px;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        padding: 0 20px;
+    }
+    
+    .star-point {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .stars-container {
+        width: 95%;
+        height: 70vh;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        padding: 20px;
+    }
+    
+    .task-input {
+        width: 100%;
+        font-size: 16px;
+    }
+    
+    .next-btn {
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .star-photo-large {
+        max-height: 250px;
+    }
+    
+    .final-content h1 {
+        font-size: 28px;
+    }
+    
+    .typewriter-text {
+        font-size: 16px;
+        padding: 0 20px 80px 20px;
+        max-height: 45vh;
+        max-height: 45dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .final-content {
+        max-height: 85dvh;
+        padding-bottom: 100px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .big-bang-container {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .music-control {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    
+    /* Touch için daha büyük butonlar */
+    .discover-btn {
+        padding: 18px 50px;
+        font-size: 20px;
+    }
+    
+    .close-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+}
+
+/* 480px ve altı - Büyük telefonlar */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 48px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        top: 10px;
+    }
+    
+    .star-point {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .stars-container {
+        height: 75vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 22px;
+    }
+    
+    .task-description {
+        font-size: 15px;
+    }
+    
+    .romantic-message {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .final-content h1 {
+        font-size: 22px;
+    }
+    
+    .final-content h1::before,
+    .final-content h1::after {
+        font-size: 20px;
+        margin: 0 8px;
+    }
+    
+    .typewriter-text {
+        font-size: 14px;
+        max-height: 40vh;
+        max-height: 40dvh;
+        padding-bottom: 100px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .final-content {
+        max-height: 80dvh;
+        padding: 15px;
+        padding-bottom: 120px;
+    }
+    
+    /* XOX oyunu mobil */
+    .xox-cell {
+        width: 80px;
+        height: 80px;
+        font-size: 36px;
+    }
+    
+    /* Memory kartları mobil */
+    .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .memory-card {
+        height: 90px;
+    }
+    
+    /* Drag & Drop mobil */
+    .drop-zone {
+        width: 100%;
+        height: 60px;
+    }
+    
+    .letter {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .letters-container {
+        gap: 10px;
+    }
+    
+    /* 12. yıldız final ekranı mobil - AGRESİF SCROLL FIX v4.0 */
+    .final-message-container {
+        height: 100dvh;
+        max-height: 100dvh;
+        padding: 15px;
+        padding-bottom: 200px; /* iOS toolbar için extra alan */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .final-text-content {
+        font-size: 1rem;
+        line-height: 1.8;
+        padding: 15px;
+        padding-bottom: 300px; /* Mobil için daha fazla boşluk - KRİTİK */
+        max-height: calc(100dvh - 80px); /* Ekran yüksekliğine göre sınırla ama scroll'a izin ver */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .star-12-wrapper {
+        height: auto;
+        min-height: fit-content;
+        max-height: none;
+        overflow: visible;
+        padding-bottom: 150px;
+    }
+    
+    .final-success {
+        max-height: none; /* Sınır kaldırıldı */
+        height: auto;
+        min-height: fit-content;
+        padding-bottom: 300px; /* "Bitanemmm Yağmurmmm..." için BOL boşluk */
+        overflow: visible;
+    }
+    
+    .final-message {
+        max-height: none; /* Sınır kaldırıldı - içerik kadar büyü */
+        height: auto;
+        overflow: visible;
+        padding: 15px;
+        padding-bottom: 250px; /* Son cümle için kritik */
+        font-size: 16px;
+        line-height: 1.9;
+    }
+    
+    .final-title {
+        font-size: 1.4rem;
+        margin-top: 10px;
+    }
+    
+    .final-message .para {
+        margin-bottom: 20px;
+        line-height: 1.9;
+    }
+    
+    .final-love-declaration {
+        font-size: 1.1rem;
+        padding-bottom: 150px; /* Kesilmemesi garanti */
+        margin-top: 30px;
+        margin-bottom: 80px;
+    }
+    
+    .love-declaration {
+        font-size: 1.2em;
+        padding-bottom: 200px; /* Kesilmemesi garanti */
+        margin-top: 30px;
+    }
+    
+    .final-message-box {
+        max-height: none;
+        height: auto;
+        overflow: visible;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    /* Modal content mobil düzeltme */
+    .modal-content {
+        max-height: 90vh;
+        max-height: 90dvh;
+        height: 90dvh;
+        padding: 25px 20px 120px 20px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #modal-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 50px;
+    }
+
+/* 360px ve altı - Küçük telefonlar */
+@media (max-width: 360px) {
+    .hero h1 {
+        font-size: 40px;
+    }
+    
+    .star-point {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .modal-content {
+        padding: 15px;
+    }
+    
+    .star-photo-large {
+        max-height: 200px;
+    }
+    
+    .final-content h1 {
+        font-size: 18px;
+    }
+    
+    /* 12. yıldız küçük ekran - AGRESİF SCROLL FIX v4.0 */
+    .final-message-container {
+        padding: 10px;
+        padding-bottom: 250px;
+    }
+    
+    .final-text-content {
+        padding: 10px;
+        padding-bottom: 350px; /* Küçük ekranda daha fazla boşluk - KRİTİK */
+        font-size: 0.95rem;
+    }
+    
+    .star-12-wrapper {
+        padding-bottom: 200px;
+    }
+    
+    .final-success {
+        max-height: none;
+        height: auto;
+        padding-bottom: 350px; /* Küçük ekranda daha fazla boşluk */
+        overflow: visible;
+    }
+    
+    .final-message {
+        max-height: none;
+        height: auto;
+        font-size: 15px;
+        padding-bottom: 300px; /* "Bitanemmm Yağmurmmm..." için ekstra boşluk */
+        overflow: visible;
+        line-height: 1.8;
+    }
+    
+    .final-title {
+        font-size: 1.2rem;
+    }
+    
+    .final-love-declaration {
+        font-size: 1rem;
+        padding-bottom: 200px;
+        margin-bottom: 100px;
+    }
+    
+    .love-declaration {
+        font-size: 1.1em;
+        padding-bottom: 250px;
+    }
+    
+    .final-message-box {
+        max-height: none;
+        height: auto;
+        overflow: visible;
+        padding: 12px;
+    }
+    
+    .final-bg-hearts {
+        opacity: 0.2;
+    }
+    
+    /* Modal içerik küçük ekran */
+    .modal-content {
+        max-height: 95vh;
+        max-height: 95dvh;
+        height: 95dvh;
+        padding: 20px 15px 150px 15px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    #modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 80px;
+    }
+    
+    #modal-body {
+        max-height: calc(80dvh - 70px);
+    }
+
+/* Touch cihazlar için optimizasyon */
+@media (hover: none) {
+    .star-point:hover {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .star-point:active {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .discover-btn:hover {
+        transform: none;
+    }
+    
+    .discover-btn:active {
+        transform: scale(0.98);
+    }
+}
+
+/* Yüksek DPI ekranlar için (Retina) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .star-point {
+        box-shadow: 
+            0 0 10px rgba(147, 51, 234, 0.5),
+            inset 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Yatay mod (landscape) mobil */
+@media (max-width: 768px) and (orientation: landscape) {
+    .hero {
+        height: auto;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+    
+    .hero h1 {
+        font-size: 48px;
+    }
+    
+    .stars-container {
+        height: 80vh;
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+        max-height: 90dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 60px;
+    }
+    
+    .final-success {
+        max-height: none;
+        height: auto;
+        overflow: visible;
+    }
+    
+    .final-message {
+        max-height: none;
+        height: auto;
+        overflow: visible;
+    }
+}
+
+/* Büyük ekranlar için optimizasyon */
+@media (min-width: 1920px) {
+    .stars-container {
+        max-width: 1400px;
+    }
+    
+    .star-point {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+    }
+    
+    .modal-content {
+        max-width: 700px;
+    }
+}
+
+/* Animasyonları azaltma seçeneği (kullanıcı tercihi) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Yazdırma için gizle */
+@media print {
+    .music-control,
+    #star-canvas,
+    .floating-heart,
+    .cursor-trail,
+    .light-ray,
+    .bokeh,
+    .nebula {
+        display: none !important;
+    }
+}
+
+
+/* ========================================
+   ⚡ PERFORMANS OPTİMİZASYONLARI
+   ======================================== */
+
+/* GPU hızlandırma için */
+.star-point,
+.floating-heart,
+.cursor-trail,
+.star-ring,
+.heart-burst,
+.final-heart-rain,
+.falling-petal,
+.floating-note {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Animasyonlu elementler için contain */
+.stars-container,
+.galaxy-map,
+.big-bang-container {
+    contain: layout style paint;
+}
+
+/* Yıldızlar için ayrı katman */
+.star-point {
+    contain: layout style;
+}
+
+/* Modal için ayrı katman */
+.star-modal {
+    contain: layout style paint;
+}
+
+/* Repaint optimizasyonu */
+.hero,
+.galaxy-map,
+.big-bang-container {
+    content-visibility: auto;
+}
+
+/* Görünmez elementleri render etme */
+[style*="display: none"] {
+    content-visibility: hidden;
+}
+
+/* Font display optimizasyonu - Google Fonts'tan yükleniyor */
+/* Not: @font-face tanımları kaldırıldı, fontlar HTML'de Google Fonts linki ile yükleniyor */
+
+/* iPhone X ve üzeri için safe-area desteği */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .modal-content {
+        padding-top: max(40px, env(safe-area-inset-top) + 20px);
+        padding-bottom: max(100px, env(safe-area-inset-bottom) + 80px);
+    }
+    
+    .final-success {
+        max-height: calc(65dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+}
+
+
+/* ========================================
+   📱 TOUCH & INTERACTION OPTİMİZASYONLARI
+   ======================================== */
+
+/* Touch davranışı */
+html {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 12. Yıldız için touch-action override */
+.star-12-wrapper,
+.final-success,
+.final-message,
+.final-message-box,
+.final-message-container,
+.final-text-content {
+    touch-action: pan-y pan-x !important; /* Scroll'a izin ver */
+    pointer-events: auto !important;
+}
+
+/* iOS Safari için ek fix */
+@supports (-webkit-touch-callout: none) {
+    .final-message-container {
+        height: -webkit-fill-available; /* iOS viewport bug fix */
+    }
+    
+    .final-text-content {
+        padding-bottom: 350px; /* iOS'ta daha fazla boşluk */
+    }
+}
+
+/* Arka Plan Efekti - Kalp Parıltıları */
+.final-bg-hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255,105,180,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(147,51,234,0.2) 0%, transparent 60%);
+    animation: bgPulse 4s ease-in-out infinite;
+}
+
+@keyframes bgPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+/* Dokunmatik hedef boyutu */
+button, 
+.star-point,
+.close-btn,
+.check-btn,
+.next-btn {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* In-view animasyonları */
+.star-point {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.star-point.in-view {
+    opacity: 1;
+}
+
+/* Scroll davranışı */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection rengi */
+::selection {
+    background: rgba(147, 51, 234, 0.3);
+    color: #ffffff;
+}
+
+/* Focus halkası */
+*:focus-visible {
+    outline: 2px solid rgba(192, 132, 252, 0.8);
+    outline-offset: 2px;
+}
+
+/* Disable text selection on interactive elements */
+.star-point,
+button,
+.letter,
+.dropped-letter {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none; /* iOS'ta uzun basınca çıkan menüyü engelle */
+}
+
+/* Harf sürükleme gesture'ı tarayıcıya kaptırılmasın (media query dışında da geçerli) */
+.letter,
+.dropped-letter {
+    touch-action: none;
+}
+
+/* Improve text rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+}
+}
+
+/* ========================================
+   12. YILDIZ - FINAL STAR SCROLL FIX v5.0
+   ======================================== */
+
+.final-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    overflow: hidden;
+}
+
+.final-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.98), rgba(75, 0, 130, 0.99));
+    backdrop-filter: blur(20px);
+}
+
+/* SCROLL'UN ÇALIŞTIĞI ANA KAPSAYICI */
+.final-scroll-container {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* PC için */
+    height: 100dvh; /* Mobil için dynamic viewport */
+    overflow-y: auto; /* BURASI ÇOK ÖNEMLİ */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
+    scrollbar-width: thin;
+    z-index: 10001;
+}
+
+.final-content-box {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px 20px 300px 20px; /* Altta 300px boşluk ZORUNLU */
+    color: white;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.9;
+    position: relative;
+    box-sizing: border-box;
+    min-height: calc(100vh + 100px); /* Scroll için minimum yükseklik */
+}
+
+.final-close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10002;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.final-title {
+    color: #ffd700;
+    text-align: center;
+    font-size: 1.6rem;
+    margin: 20px 0 40px 0;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    line-height: 1.3;
+    animation: titlePulse 2s ease-in-out infinite;
+}
+
+.final-text-wrapper {
+    font-size: 1.15rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.final-text-wrapper p {
+    margin-bottom: 25px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.final-love-box {
+    background: rgba(255, 105, 180, 0.25);
+    border: 2px solid rgba(255, 105, 180, 0.6);
+    border-radius: 25px;
+    padding: 30px 25px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff69b4;
+    text-shadow: 0 0 15px rgba(255, 105, 180, 0.9);
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0.4);
+    line-height: 1.7;
+    position: relative;
+    overflow: visible;
+}
+
+.final-love-box::before {
+    content: "💖";
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 30px;
+    background: rgba(138, 43, 226, 0.8);
+    padding: 0 10px;
+    border-radius: 50%;
+}
+
+.final-spacer {
+    height: 200px; /* En alta ekstra boşluk */
+    width: 100%;
+    display: block;
+}
+
+/* Scrollbar Stil */
+.final-scroll-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.final-scroll-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.final-scroll-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff69b4, #ffd700);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+/* Animasyonlar */
+@keyframes titlePulse {
+    0%, 100% { transform: scale(1); text-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+    50% { transform: scale(1.02); text-shadow: 0 0 50px rgba(255, 215, 0, 0.9); }
+}
+
+/* ========================================
+   MOBİL İÇİN ÖZEL AYARLAR (ÇOK ÖNEMLİ)
+   ======================================== */
+@media screen and (max-width: 768px) {
+    .final-scroll-container {
+        height: 100dvh; /* Dynamic viewport height */
+        padding-top: env(safe-area-inset-top, 0);
+        padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    /* Kapatma butonu: çentik altına insin ve parmakla rahat basılsın */
+    .final-close-btn {
+        top: calc(env(safe-area-inset-top, 0px) + 12px);
+        right: calc(env(safe-area-inset-right, 0px) + 12px);
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+    
+    .final-content-box {
+        padding: 40px 15px 350px 15px; /* Mobilde daha fazla boşluk */
+        font-size: 1rem;
+    }
+    
+    .final-title {
+        font-size: 1.3rem;
+        margin-top: 10px;
+    }
+    
+    .final-text-wrapper {
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+    
+    .final-love-box {
+        font-size: 1.15rem;
+        padding: 25px 20px;
+        margin-top: 40px;
+    }
+    
+    .final-spacer {
+        height: 250px; /* Mobilde daha fazla boşluk */
+    }
+}
+
+/* iPhone SE gibi küçük ekranlar */
+@media screen and (max-width: 375px) {
+    .final-content-box {
+        padding-bottom: 400px;
+    }
+    
+    .final-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* iOS için ek fix */
+@supports (-webkit-touch-callout: none) {
+    /* dvh desteklenmiyorsa yedek; destekleniyorsa aşağıdaki kural kazanır */
+    .final-scroll-container {
+        height: -webkit-fill-available;
+    }
+
+    @supports (height: 100dvh) {
+        .final-scroll-container {
+            height: 100dvh;
+        }
+    }
+
+    .final-content-box {
+        padding-bottom: 350px; /* iOS'ta ekstra boşluk */
+    }
+}
+
+
+/* ========================================
+   12. YILDIZ - BASİT VE DİREKT ÇÖZÜM
+   ======================================== */
+
+/* 12. Yıldız Task Area - Scroll Fix */
+.task-area[style*="max-height: 60vh"] {
+    scrollbar-width: thin;
+}
+
+.task-area[style*="max-height: 60vh"]::-webkit-scrollbar {
+    width: 8px;
+}
+
+.task-area[style*="max-height: 60vh"]::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+.task-area[style*="max-height: 60vh"]::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff69b4, #ffd700);
+    border-radius: 4px;
+}
+
+/* Son Cümle Stili - Basit ve direkt */
+.final-love-box {
+    background: rgba(255, 105, 180, 0.2) !important;
+    border: 2px solid rgba(255, 105, 180, 0.6) !important;
+    border-radius: 20px !important;
+    padding: 25px 20px !important;
+    margin-top: 30px !important;
+    margin-bottom: 50px !important;
+    text-align: center !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    color: #ff69b4 !important;
+    text-shadow: 0 0 15px rgba(255, 105, 180, 0.8) !important;
+    box-shadow: 0 0 30px rgba(255, 105, 180, 0.3) !important;
+    line-height: 1.7 !important;
+    position: relative !important;
+}
+
+/* Mobil için */
+@media screen and (max-width: 768px) {
+    .task-area[style*="max-height: 60vh"] {
+        max-height: 70vh !important;
+        padding: 15px !important;
+    }
+    
+    .final-love-box {
+        font-size: 1.1rem !important;
+        padding: 20px 15px !important;
+        margin-bottom: 80px !important;
+    }
+}
+
+/* iOS için */
+@supports (-webkit-touch-callout: none) {
+    .task-area[style*="max-height: 60vh"] {
+        max-height: 65vh !important;
+        padding-bottom: 150px !important;
+    }
+}
